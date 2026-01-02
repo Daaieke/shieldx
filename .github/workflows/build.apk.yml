@@ -16,6 +16,10 @@ jobs:
           channel: 'stable'
           
       - run: flutter pub get
+      
+      # THIS IS THE MAGIC FIX: Generates the missing Android folder
+      - run: flutter create . --platforms android
+      
       - run: flutter build apk --debug --split-per-abi
       
       - name: Upload APK
