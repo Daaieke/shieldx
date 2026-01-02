@@ -1,8 +1,5 @@
-name: Build SHIELDX APK
-
-on:
-  push:
-    branches: [ "main" ]
+name: Build APK
+on: [push, workflow_dispatch]
 
 jobs:
   build:
@@ -10,20 +7,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
+      # Install Flutter (Latest Stable Version)
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'
           channel: 'stable'
           
+      # 1. Force-create the missing Android structure
+      - run: flutter create .
+      
+      # 2. Install dependencies
       - run: flutter pub get
       
-      # THIS IS THE MAGIC FIX: Generates the missing Android folder
-      - run: flutter create . --platforms android
+      # 3. Build the Universal Debug APK (Simpler command)
+      - run: flutter build apk --debug
       
-      - run: flutter build apk --debug --split-per-abi
-      
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
+      # 4. Upload the result
+      - uses: actions/upload-artifact@v4
         with:
-          name: shieldx-debug-apk
+          name: shieldx-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
